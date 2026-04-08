@@ -19,15 +19,11 @@
     ?~  key-arg  (strand-fail %missing-api-key ~)
     ?>  ?=([%string @t] u.key-arg)
     =/  key=@t  p.u.key-arg
-    ::  H1: encode as hex literal to avoid corruption from special chars
+    ::  reject keys containing single quotes (would break the cord literal)
     ::
-    =/  hoon-src=@t
-      %-  crip
-      ;:  welp
-        "^-(cord "
-        (scow %ux `@ux`key)
-        ")"
-      ==
+    ?:  !=(~ (find "'" (trip key)))
+      (strand-fail %invalid-api-key ~)
+    =/  hoon-src=@t  (crip (weld "'" (weld (trip key) "'")))
     ;<  =bowl:rand  bind:m  get-bowl:io
     ::  write key as a hoon literal to /lib/oilprice-key/hoon
     ::
