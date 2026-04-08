@@ -47,34 +47,16 @@ Copy the cookie value — it looks like `urbauth-~your-ship=0v6.abcde.fghij...`
 
 ### Step 3: Connect Claude Code to your ship
 
-Add this to `~/.claude/settings.json` (or your project's `.claude/settings.json`):
+Add this to `~/.claude.json` (or `~/.claude/settings.json`):
 
 ```json
 {
   "mcpServers": {
     "oilprice": {
-      "type": "url",
+      "type": "http",
       "url": "https://your-ship.example.com/mcp/oilpriceapi",
       "headers": {
         "Cookie": "urbauth-~your-ship=0v6.abcde.fghij..."
-      }
-    }
-  }
-}
-```
-
-For **Claude Desktop**, add to `claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "oilprice": {
-      "transport": {
-        "type": "streamable-http",
-        "url": "https://your-ship.example.com/mcp/oilpriceapi",
-        "headers": {
-          "Cookie": "urbauth-~your-ship=0v6.abcde.fghij..."
-        }
       }
     }
   }
