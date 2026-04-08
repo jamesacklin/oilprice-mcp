@@ -47,7 +47,7 @@ Copy the cookie value — it looks like `urbauth-~your-ship=0v6.abcde.fghij...`
 
 ### Step 3: Connect Claude Code to your ship
 
-Add this to `~/.claude.json` (or `~/.claude/settings.json`):
+Add this to `~/.claude.json`:
 
 ```json
 {
