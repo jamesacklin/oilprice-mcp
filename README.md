@@ -39,13 +39,7 @@ Use the `opa-set-api-key` tool from any connected MCP client:
 }
 ```
 
-**Option B — via dojo:**
-
-```
-:oilprice &add-tool ...
-```
-
-Or edit the key file directly on the mounted desk:
+**Option B — edit the key file on the mounted desk:**
 
 ```
 |mount %oilprice
