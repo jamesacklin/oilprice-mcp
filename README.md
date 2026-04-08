@@ -2,6 +2,8 @@
 
 A standalone [Model Context Protocol](https://modelcontextprotocol.io) server running as a Gall agent on Urbit, providing real-time oil, gas, and energy commodity data from [OilpriceAPI](https://www.oilpriceapi.com).
 
+![](https://github.com/user-attachments/assets/75b52097-0f0d-425a-b549-2da1064a2e1d)
+
 ## Quick Start
 
 There are two keys involved:
