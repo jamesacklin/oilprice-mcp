@@ -5,7 +5,7 @@
 =,  strand-fail=strand-fail:strand:spider
 ^-  tool:mcp
 :*  'opa-get-forecasts'
-    'Get the latest energy price forecasts.'
+    'Get energy price forecasts. Note: this endpoint may not be available on all API tiers.'
     ~
     ~
 ::
@@ -28,7 +28,7 @@
     ::
     =/  =request:http
       :^  %'GET'  (crip url)
-        ~[['Authorization' (crip (weld "Token " (trip api-key)))] ['Accept' 'application/json']]
+        ~[['Authorization' (crip (weld "Bearer " (trip api-key)))] ['Accept' 'application/json']]
       ~
     ;<  ~  bind:m  (send-request:io request)
     ;<  =client-response:iris  bind:m  take-client-response:io

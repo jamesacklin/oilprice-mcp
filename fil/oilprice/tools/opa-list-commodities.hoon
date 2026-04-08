@@ -28,7 +28,7 @@
     ::
     =/  =request:http
       :^  %'GET'  (crip url)
-        ~[['Authorization' (crip (weld "Token " (trip api-key)))] ['Accept' 'application/json']]
+        ~[['Authorization' (crip (weld "Bearer " (trip api-key)))] ['Accept' 'application/json']]
       ~
     ;<  ~  bind:m  (send-request:io request)
     ;<  =client-response:iris  bind:m  take-client-response:io

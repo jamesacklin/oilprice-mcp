@@ -5,7 +5,7 @@
 =,  strand-fail=strand-fail:strand:spider
 ^-  tool:mcp
 :*  'opa-get-opec-production'
-    'Get the latest OPEC oil production data.'
+    'Get the latest OPEC oil production data. Note: this endpoint may not be available on all API tiers.'
     ~
     ~
 ::
@@ -28,7 +28,7 @@
     ::
     =/  =request:http
       :^  %'GET'  (crip url)
-        ~[['Authorization' (crip (weld "Token " (trip api-key)))] ['Accept' 'application/json']]
+        ~[['Authorization' (crip (weld "Bearer " (trip api-key)))] ['Accept' 'application/json']]
       ~
     ;<  ~  bind:m  (send-request:io request)
     ;<  =client-response:iris  bind:m  take-client-response:io

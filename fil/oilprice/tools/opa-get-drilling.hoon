@@ -5,9 +5,9 @@
 =,  strand-fail=strand-fail:strand:spider
 ^-  tool:mcp
 :*  'opa-get-drilling'
-    'Get the latest drilling data. Optionally filter by region.'
+    'Get drilling intelligence. Optionally filter by basin. Premium feature.'
     %-  my
-    :~  ['region' [%string 'Region name (optional, e.g. us, europe, middle-east)']]
+    :~  ['region' [%string 'Basin name (optional, e.g. permian, eagle_ford, bakken)']]
     ==
     ~
 ::
@@ -16,12 +16,10 @@
     =/  m  (strand:spider ,vase)
     ^-  form:m
     =/  reg-arg=(unit argument:tool:mcp)  (~(get by args) 'region')
-    ::  GET /v1/drilling/latest[?region={region}]
-    ::
     =/  url=tape
-      ?~  reg-arg  "https://api.oilpriceapi.com/v1/drilling/latest"
+      ?~  reg-arg  "https://api.oilpriceapi.com/v1/drilling-intelligence/summary"
       ?>  ?=([%string @t] u.reg-arg)
-      (weld "https://api.oilpriceapi.com/v1/drilling/latest?region=" (trip p.u.reg-arg))
+      (weld "https://api.oilpriceapi.com/v1/drilling-intelligence/basin/" (cass (trip p.u.reg-arg)))
     ::  load API key
     ::
     ;<  =bowl:rand  bind:m  get-bowl:io
@@ -34,7 +32,7 @@
     ::
     =/  =request:http
       :^  %'GET'  (crip url)
-        ~[['Authorization' (crip (weld "Token " (trip api-key)))] ['Accept' 'application/json']]
+        ~[['Authorization' (crip (weld "Bearer " (trip api-key)))] ['Accept' 'application/json']]
       ~
     ;<  ~  bind:m  (send-request:io request)
     ;<  =client-response:iris  bind:m  take-client-response:io

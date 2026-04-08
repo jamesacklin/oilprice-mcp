@@ -5,9 +5,9 @@
 =,  strand-fail=strand-fail:strand:spider
 ^-  tool:mcp
 :*  'opa-get-futures-curve'
-    'Get the futures curve for a contract. Use BZ for Brent or CL for WTI.'
+    'Get futures spreads for a contract. Use brent/BZ, wti/CL, or ng. Premium feature.'
     %-  my
-    :~  ['contract' [%string 'Futures contract code: BZ (Brent) or CL (WTI)']]
+    :~  ['contract' [%string 'Contract: brent (or BZ), wti (or CL), ng (or natural gas)']]
     ==
     ~['contract']
 ::
@@ -18,10 +18,13 @@
     =/  con-arg=(unit argument:tool:mcp)  (~(get by args) 'contract')
     ?~  con-arg  (strand-fail %missing-contract ~)
     ?>  ?=([%string @t] u.con-arg)
-    =/  contract=tape  (cuss (trip p.u.con-arg))
-    ::  GET /v1/futures/curve?contract={contract}
-    ::
-    =/  url=tape  (weld "https://api.oilpriceapi.com/v1/futures/curve?contract=" contract)
+    =/  contract=tape  (cass (trip p.u.con-arg))
+    =/  path=tape
+      ?:  |(=(contract "bz") =(contract "brent"))  "/v1/futures/ice-brent/spreads"
+      ?:  |(=(contract "cl") =(contract "wti"))  "/v1/futures/ice-wti/spreads"
+      ?:  |(=(contract "ng") =(contract "natural gas"))  "/v1/futures/natural-gas/spreads"
+      :(weld "/v1/futures/" contract "/spreads")
+    =/  url=tape  (weld "https://api.oilpriceapi.com" path)
     ::  load API key
     ::
     ;<  =bowl:rand  bind:m  get-bowl:io
@@ -34,7 +37,7 @@
     ::
     =/  =request:http
       :^  %'GET'  (crip url)
-        ~[['Authorization' (crip (weld "Token " (trip api-key)))] ['Accept' 'application/json']]
+        ~[['Authorization' (crip (weld "Bearer " (trip api-key)))] ['Accept' 'application/json']]
       ~
     ;<  ~  bind:m  (send-request:io request)
     ;<  =client-response:iris  bind:m  take-client-response:io

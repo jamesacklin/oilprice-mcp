@@ -44,9 +44,9 @@
       =/  hit=(unit tape)  (~(get by states) input)
       ?^  hit  u.hit
       (cuss input)
-    ::  GET /v1/prices/latest?by_code=DIESEL_RETAIL_STATE_{abbr}_USD
+    ::  GET /v1/diesel-prices?state={abbr}
     ::
-    =/  url=tape  :(weld "https://api.oilpriceapi.com/v1/prices/latest?by_code=DIESEL_RETAIL_STATE_" abbr "_USD")
+    =/  url=tape  (weld "https://api.oilpriceapi.com/v1/diesel-prices?state=" abbr)
     ::  load API key
     ::
     ;<  =bowl:rand  bind:m  get-bowl:io
@@ -59,7 +59,7 @@
     ::
     =/  =request:http
       :^  %'GET'  (crip url)
-        ~[['Authorization' (crip (weld "Token " (trip api-key)))] ['Accept' 'application/json']]
+        ~[['Authorization' (crip (weld "Bearer " (trip api-key)))] ['Accept' 'application/json']]
       ~
     ;<  ~  bind:m  (send-request:io request)
     ;<  =client-response:iris  bind:m  take-client-response:io
