@@ -1,0 +1,9 @@
+:~
+  title+'mcp-server'
+  info+'Uribt MCP server'
+  color+0xff.69b4
+  version+[0 1 0]
+  website+'https://en.wikipedia.org/'
+  license+'MIT'
+  site+/apps/mcp
+==
