@@ -1,92 +1,69 @@
 # OilpriceAPI MCP Server for Urbit
 
-A standalone [Model Context Protocol](https://modelcontextprotocol.io) server running as a Gall agent on Urbit, providing real-time oil, gas, and energy commodity data from [Oil Price API](https://www.oilpriceapi.com).
+A standalone [Model Context Protocol](https://modelcontextprotocol.io) server running as a Gall agent on Urbit, providing real-time oil, gas, and energy commodity data from [OilpriceAPI](https://www.oilpriceapi.com).
 
-## Setup
+## Quick Start
 
-### 1. Install the desk
+There are two keys involved:
 
-If you received this desk from a remote ship:
+- **Urbit session cookie** — authenticates Claude to your ship's Eyre HTTP interface
+- **OilpriceAPI key** — authenticates your ship to the OilpriceAPI data service
 
+### Step 1: Install the desk on your ship
+
+Clone this repo into your ship's pier directory and install:
+
+```bash
+# from your pier directory (e.g. ~/zod/)
+cp -r /path/to/oilprice-mcp oilprice
 ```
-|install ~sampel-palnet %oilprice
-```
 
-If building locally, commit and install:
+Then in your ship's dojo:
 
 ```
 |commit %oilprice
 |install our %oilprice
 ```
 
-The agent binds to `/mcp/oilpriceapi` on Eyre.
-
-### 2. Set your API key
-
-Get a free API key at [oilpriceapi.com](https://www.oilpriceapi.com) (200 requests/month on the free tier).
-
-**Option A — via MCP tool call:**
-
-Use the `opa-set-api-key` tool from any connected MCP client:
-
-```json
-{
-  "method": "tools/call",
-  "params": {
-    "name": "opa-set-api-key",
-    "arguments": { "api_key": "your-key-here" }
-  }
-}
-```
-
-**Option B — edit the key file on the mounted desk:**
+Or install from a remote ship that distributes it:
 
 ```
-|mount %oilprice
+|install ~sampel-palnet %oilprice
 ```
 
-Then write your key as a Hoon cord literal to `zod/oilprice/lib/oilprice-key.hoon`:
+The agent binds to `/mcp/oilpriceapi` on Eyre automatically.
 
-```hoon
-'your-key-here'
-```
+### Step 2: Get your Urbit session cookie
 
-And commit:
-
-```
-|commit %oilprice
-```
-
-### 3. Connect an MCP client
-
-The server uses MCP Streamable HTTP transport. You need an authenticated Eyre session cookie.
-
-**Get your session cookie:**
+Run `+code` in your dojo to get your web login code, then authenticate:
 
 ```bash
-curl -c - -X POST https://your-ship.tlon.network/~/login \
-  -d "password=$(cat your-code)"
+curl -v -X POST https://your-ship.example.com/~/login \
+  -d 'password=YOUR-CODE-HERE' \
+  2>&1 | grep 'set-cookie'
 ```
 
-This returns a cookie like `urbauth-~your-ship=0v6.abcde...`.
+Copy the cookie value — it looks like `urbauth-~your-ship=0v6.abcde.fghij...`
 
-**Claude Code** (`~/.claude/settings.json`):
+### Step 3: Connect Claude Code to your ship
+
+Add this to `~/.claude/settings.json` (or your project's `.claude/settings.json`):
 
 ```json
 {
   "mcpServers": {
     "oilprice": {
       "type": "url",
-      "url": "https://your-ship.tlon.network/mcp/oilpriceapi",
+      "url": "https://your-ship.example.com/mcp/oilpriceapi",
       "headers": {
-        "Cookie": "urbauth-~your-ship=SESSION_COOKIE"
+        "Cookie": "urbauth-~your-ship=0v6.abcde.fghij..."
       }
     }
   }
 }
 ```
 
-**Claude Desktop** (`claude_desktop_config.json`):
+For **Claude Desktop**, add to `claude_desktop_config.json`:
 
 ```json
 {
@@ -94,14 +71,44 @@ This returns a cookie like `urbauth-~your-ship=0v6.abcde...`.
     "oilprice": {
       "transport": {
         "type": "streamable-http",
-        "url": "https://your-ship.tlon.network/mcp/oilpriceapi",
+        "url": "https://your-ship.example.com/mcp/oilpriceapi",
         "headers": {
-          "Cookie": "urbauth-~your-ship=SESSION_COOKIE"
+          "Cookie": "urbauth-~your-ship=0v6.abcde.fghij..."
         }
       }
     }
   }
 }
+```
+
+Restart Claude Code / Claude Desktop to pick up the new server.
+
+### Step 4: Set your OilpriceAPI key
+
+Get a free key at [oilpriceapi.com](https://www.oilpriceapi.com) (200 requests/month on the free tier).
+
+Once Claude is connected to your ship, just ask it to set your key:
+
+> "Set my OilpriceAPI key to abc123xyz"
+
+Claude will call the `opa-set-api-key` tool, which writes the key to your ship. All other tools will use it automatically.
+
+**Alternative** — set the key by hand on the mounted desk:
+
+```
+> |mount %oilprice
+```
+
+Write your key as a Hoon cord literal to `<pier>/oilprice/lib/oilprice-key.hoon`:
+
+```hoon
+'your-key-here'
+```
+
+Then commit:
+
+```
+> |commit %oilprice
 ```
 
 ## Tools
@@ -154,10 +161,14 @@ Or pass any raw API code directly (e.g. `BRENT_CRUDE_USD`).
 - **Desk**: `%oilprice` — self-contained, no dependency on `%mcp`
 - **Agent**: `%oilprice` — Gall agent handling MCP JSON-RPC over Streamable HTTP
 - **Eyre path**: `/mcp/oilpriceapi`
-- **API key**: stored as a Hoon cord literal in `/lib/oilprice-key.hoon`
+- **API key**: stored in `/lib/oilprice-key.hoon`, set via `opa-set-api-key` tool or manual edit
 - **Tools**: file-based at `/fil/oilprice/tools/`, auto-installed on agent init
 
 Each tool runs as a Khan thread that makes an authenticated HTTP request to `api.oilpriceapi.com` via the Iris vane, parses the JSON response, and returns it to the MCP client.
+
+## Session cookies
+
+Urbit session cookies expire periodically. If Claude starts getting authentication errors, generate a fresh cookie (step 2) and update your settings.
 
 ## License
 
