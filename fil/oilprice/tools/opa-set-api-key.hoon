@@ -19,19 +19,15 @@
     ?~  key-arg  (strand-fail %missing-api-key ~)
     ?>  ?=([%string @t] u.key-arg)
     =/  key=@t  p.u.key-arg
-    ::  reject keys containing single quotes (would break the cord literal)
-    ::
-    ?:  !=(~ (find "'" (trip key)))
-      (strand-fail %invalid-api-key ~)
-    =/  hoon-src=@t  (crip (weld "'" (weld (trip key) "'")))
     ;<  =bowl:rand  bind:m  get-bowl:io
-    ::  write key as a hoon literal to /lib/oilprice-key/hoon
+    ::  write raw key to /dat/api-key/hoon via Clay %info
+    ::  read back by tools with read-file:io (%x care)
     ::
     ;<  ~  bind:m
       %:  send-raw-card:io
           %pass   /set-api-key
           %arvo   %c  %info
-          [q.byk.bowl %& [/lib/oilprice-key/hoon %ins %hoon !>(hoon-src)]~]
+          [q.byk.bowl %& [/dat/api-key/hoon %ins %hoon !>(key)]~]
       ==
     %-  pure:m
     !>  ^-  json

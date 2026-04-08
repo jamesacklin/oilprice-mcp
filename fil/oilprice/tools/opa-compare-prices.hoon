@@ -25,10 +25,9 @@
     ::  load API key
     ::
     ;<  =bowl:rand  bind:m  get-bowl:io
-    ;<  vax=(unit vase)  bind:m
-      (build-file:io [our.bowl q.byk.bowl da+now.bowl] /lib/oilprice-key)
-    ?~  vax  (strand-fail %no-api-key ~)
-    =/  api-key=@t  !<(@t u.vax)
+    ;<  =cage  bind:m
+      (read-file:io [our.bowl q.byk.bowl da+now.bowl] /dat/api-key/hoon)
+    =/  api-key=@t  !<(@t q.cage)
     ?:  =(api-key 'YOUR_API_KEY_HERE')
       (strand-fail %no-api-key-configured ~)
     ::  fetch from API
