@@ -34,8 +34,24 @@
     ;<  =client-response:iris  bind:m  take-client-response:io
     ?>  ?=(%finished -.client-response)
     ?.  =(2 (div status-code.response-header.client-response 100))
-      ~|  [%http-error status-code.response-header.client-response]
-      (strand-fail %http-error ~)
+      =/  code=@ud  status-code.response-header.client-response
+      %-  pure:m
+      !>  ^-  json
+      %-  pairs:enjs:format
+      :~  ['type' s+'text']
+          :-  'text'
+          :-  %s
+          %-  crip
+          ?:  =(403 code)
+            "Error: 403 Forbidden. This endpoint requires a premium OilpriceAPI key. Upgrade at https://www.oilpriceapi.com"
+          ?:  =(401 code)
+            "Error: 401 Unauthorized. Your API key may be invalid. Set a new one with opa-set-api-key."
+          ?:  =(429 code)
+            "Error: 429 Rate limit exceeded. The free tier allows 200 requests/month."
+          ?:  =(404 code)
+            "Error: 404 Not found. The requested resource does not exist."
+          (weld "Error: HTTP " (weld (scow %ud code) " from OilpriceAPI."))
+      ==
     ;<  body=cord  bind:m  (extract-body:io client-response)
     =/  jon=(unit json)  (de:json:html body)
     ?~  jon  (strand-fail %json-parse-error ~)
